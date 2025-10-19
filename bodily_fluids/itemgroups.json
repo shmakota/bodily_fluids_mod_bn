@@ -1,0 +1,52 @@
+[
+  {
+    "id": "clutter_bedroom",
+    "type": "item_group",
+    "subtype": "distribution",
+    "items": [
+      [ "diaper_box", 5 ]
+    ]
+  },
+  {
+    "type": "item_group",
+    "id": "softdrugs",
+    "items": [
+      [ "diaper_box", 10 ]
+    ]
+  },
+  {
+    "type": "item_group",
+    "id": "bedroom",
+    "ammo": 50,
+    "magazine": 100,
+    "subtype": "distribution",
+    "entries": [
+      { "item": "diaper_box", "prob": 10 }
+    ]
+  },
+  {
+    "type": "item_group",
+    "id": "trash",
+    "ammo": 20,
+    "magazine": 50,
+    "items": [
+      [ "dirty_diaper", 5 ]
+    ]
+  },
+  {
+    "type": "item_group",
+    "id": "trash_dumpster",
+    "subtype": "collection",
+    "items": [
+      [ "dirty_diaper", 10 ]
+    ]
+  },
+ {
+    "type": "item_group",
+    "id": "child_items",
+    "items": [
+      [ "dirty_diaper", 10 ],
+      [ "diaper", 10 ]
+    ]
+  }
+]

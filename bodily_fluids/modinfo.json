@@ -1,0 +1,13 @@
+[
+  {
+    "type": "MOD_INFO",
+    "id": "bodily_fluids",
+    "name": "<color_brown>Bodily Fluids</color>",
+    "authors": [ "Kota" ],
+    "description": "Adds bodily fluids as well as related mechanics for toilets.\n\nNOTE: There is currently no way to interrupt long crafting actions, so you may have to pay more attention to the log if you don't want to dirty up your base.",
+    "category": "rebalance",
+    "obsolete": false,
+    "lua_api_version": 2,
+    "dependencies": [ "bn" ]
+  }
+]

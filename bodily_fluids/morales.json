@@ -1,0 +1,17 @@
+[
+  {
+    "id": "morale_soiled_yourself",
+    "type": "morale_type",
+    "text": "Soiled yourself"
+  },
+  {
+    "id": "morale_used_diaper",
+    "type": "morale_type",
+    "text": "Used diaper"
+  },
+  {
+    "id": "morale_used_toilet",
+    "type": "morale_type",
+    "text": "Used toilet"
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "type": "profession_item_substitutions",
+    "trait": "INCONTINENT",
+    "//": "doesnt work because of snake traits",
+    "sub": [
+    ]
+  }
+]

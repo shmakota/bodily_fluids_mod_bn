@@ -1,0 +1,32 @@
+[
+  {
+    "type": "mutation",
+    "id": "incontinent",
+    "name": { "str": "Incontinent" },
+    "points": -2,
+    "valid": false,
+    "starting_trait": true,
+    "purifiable": false,
+    "description": "You can't control your bladder or bowels very well.  You have trouble using the bathroom on command, and have trouble telling how close you are to needing to go."
+  },
+  {
+    "type": "mutation",
+    "id": "pee",
+    "name": { "str": "Pee" },
+    "points": 99,
+    "valid": false,
+    "player_display": false,
+    "description": "Pee on the tile you're on, or something else nearby.",
+    "active": true
+  },
+  {
+    "type": "mutation",
+    "id": "defecate",
+    "name": { "str": "Defecate" },
+    "points": 99,
+    "valid": false,
+    "player_display": false,
+    "description": "Defecate on the tile you're on.",
+    "active": true
+  }
+]
