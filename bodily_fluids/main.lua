@@ -19,7 +19,7 @@ function mod.every_turn()
     handle_bladder(avatar)
     handle_stomach(avatar)
 
-    mod.debug_burn(avatar)
+    --mod.debug_burn(avatar)
 end
 
 ------------------------------------------------------------
@@ -28,12 +28,16 @@ end
 function handle_bladder(avatar)
     local bladder = tonumber(avatar:get_value("bladder")) or 0
 
-    bladder = bladder + .002
+    bladder = bladder + get_thirst_difference() * 1
     if bladder > 100 then bladder = 100 end
     avatar:set_value("bladder", tostring(bladder))
 
     if bladder >= 90 and avatar:get_value("bladder_warned_90") ~= "1" then
         if not avatar:has_trait( MutationBranchId.new("incontinent") ) then
+            gapi.add_msg(gapi.get_avatar().current_activity_id)
+            if gapi.get_avatar().current_activity_id ~= ActivityTypeId.NULL_ID then
+                gapi.get_avatar():cancel_activity()
+            end
             gapi.add_msg(MsgType.bad, "You're about to pee yourself!")
         end
         avatar:set_value("bladder_warned_90", "1")
@@ -59,19 +63,49 @@ function handle_bladder(avatar)
     end
 end
 
+function get_thirst_difference()
+    local avatar = gapi.get_avatar()
+    if not avatar then return 0 end
+
+    local last_thirst = tonumber(avatar:get_value("last_thirst")) or avatar:get_thirst()
+    local thirst_current = avatar:get_thirst() or 0
+    local difference = thirst_current - last_thirst
+
+    --gapi.add_msg("[BODILY DEBUG] Thirst difference: " .. tostring(difference))
+
+    avatar:set_value("last_thirst", tostring(thirst_current))
+    return difference
+end
+
+function get_kcal_difference()
+    local avatar = gapi.get_avatar()
+    if not avatar then return 0 end
+
+    local last_kcal = tonumber(avatar:get_value("last_kcal")) or avatar:get_stored_kcal()
+    local kcal_current = avatar:get_stored_kcal() or 0
+    local difference = kcal_current - last_kcal
+
+    --gapi.add_msg("[BODILY DEBUG] Kcal difference: " .. tostring(difference))
+
+    avatar:set_value("last_kcal", tostring(kcal_current))
+    return difference
+end
+
 ------------------------------------------------------------
 -- STOMACH / DEFECATE
 ------------------------------------------------------------
 function handle_stomach(avatar)
     local stomach = tonumber(avatar:get_value("stomach")) or 0
 
-    local delta = .001
-    stomach = stomach + delta
+    stomach = stomach - get_kcal_difference()/20
     if stomach > 100 then stomach = 100 end
     avatar:set_value("stomach", tostring(stomach))
 
     if stomach >= 90 and avatar:get_value("stomach_warned_90") ~= "1" then
         if not avatar:has_trait( MutationBranchId.new("incontinent") ) then
+            if gapi.get_avatar().current_activity_id ~= ActivityTypeId.NULL_ID then
+                gapi.get_avatar():cancel_activity()
+            end
             gapi.add_msg(MsgType.bad, "You're about to soil yourself!")
         end
         avatar:set_value("stomach_warned_90", "1")
