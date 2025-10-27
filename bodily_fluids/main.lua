@@ -34,7 +34,6 @@ function handle_bladder(avatar)
 
     if bladder >= 90 and avatar:get_value("bladder_warned_90") ~= "1" then
         if not avatar:has_trait( MutationBranchId.new("incontinent") ) then
-            gapi.add_msg(gapi.get_avatar().current_activity_id)
             if gapi.get_avatar().current_activity_id ~= ActivityTypeId.NULL_ID then
                 gapi.get_avatar():cancel_activity()
             end
@@ -42,7 +41,7 @@ function handle_bladder(avatar)
         end
         avatar:set_value("bladder_warned_90", "1")
     elseif bladder >= 75 and bladder < 90 and avatar:get_value("bladder_warned_75") ~= "1" then
-        gapi.add_msg(MsgType.info, "You really have to pee soon.")
+        gapi.add_msg(MsgType.info, "You really need to pee soon.")
         avatar:set_value("bladder_warned_75", "1")
     elseif bladder >= 50 and bladder < 75 and avatar:get_value("bladder_warned_50") ~= "1" then
         gapi.add_msg(MsgType.info, "Your bladder is starting to feel full.")
