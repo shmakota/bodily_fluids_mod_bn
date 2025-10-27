@@ -48,7 +48,7 @@ function handle_bladder(avatar)
         avatar:set_value("bladder_warned_50", "1")
     end
 
-    if avatar:has_active_mutation(MutationBranchId.new("pee")) then
+    if avatar:has_active_mutation(MutationBranchId.new("pee")) or avatar:hp_percentage() <= 5 then
         avatar:deactivate_mutation(MutationBranchId.new("pee"))
         if math.floor(avatar:get_value("bladder", 0 )/10) < 1 or avatar:has_trait( MutationBranchId.new("incontinent") ) then
             gapi.add_msg(MsgType.info, "You don't feel the urge to go yet.")
@@ -116,7 +116,7 @@ function handle_stomach(avatar)
         avatar:set_value("stomach_warned_50", "1")
     end
 
-    if avatar:has_active_mutation(MutationBranchId.new("defecate")) then
+    if avatar:has_active_mutation(MutationBranchId.new("defecate")) or avatar:hp_percentage() <= 5 then
         avatar:deactivate_mutation(MutationBranchId.new("defecate"))
         if math.floor(avatar:get_value("stomach", 0 )/10) < 1 or avatar:has_trait( MutationBranchId.new("incontinent") ) then
             gapi.add_msg(MsgType.info, "You don't feel the urge to go yet.")
