@@ -14,6 +14,7 @@ Adds basic bladder/stomach mechanics and related items to Cataclysm: Bright Nigh
  - Soiling (urinating/defecating) applies a morale penalty and can wet items.
  - Male characters may choose a direction to pee; urine can extinguish small fires.
  - Thirst and metabolism affect how quickly bladder/stomach fill.
+ - The character will expel their bodily fluid contents when on the very brink of death.
 
 # Behavior
  - Every turn the mod updates bladder (from thirst) and stomach (from kcal/metabolism).
