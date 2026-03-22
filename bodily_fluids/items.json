@@ -38,6 +38,22 @@
     "flags": [ "NO_SALVAGE", "FERTILIZER" ]
   },
   {
+    "type": "GENERIC",
+    "id": "human_fertilizer",
+    "name": { "str_sp": "human fertilizer" },
+    "description": "Composted human waste blended with water to yield a usable fertilizer when nothing else is available.",
+    "weight": "300 g",
+    "volume": "250 ml",
+    "color": "dark_gray",
+    "symbol": "*",
+    "looks_like": "feces_dog",
+    "material": [ "feces" ],
+    "phase": "solid",
+    "price": "0 USD",
+    "price_postapoc": "0 USD",
+    "flags": [ "FERTILIZER" ]
+  },
+  {
     "id": "diaper",
     "type": "ARMOR",
     "name": { "str_sp": "diaper" },

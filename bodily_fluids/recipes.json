@@ -45,5 +45,18 @@
     "tools": [ [ [ "surface_heat", 3, "LIST" ] ] ],
     "byproducts": [ [ "salt", 1 ] ],
     "components": [ [ [ "human_urine", 2 ] ] ]
+  },
+  {
+    "type": "recipe",
+    "result": "human_fertilizer",
+    "category": "CC_OTHER",
+    "subcategory": "CSC_OTHER",
+    "skill_used": "gardening",
+    "time": "15 m",
+    "autolearn": true,
+    "components": [
+      [ [ "human_feces", 5 ] ],
+      [ [ "water", 1 ], [ "water_clean", 1 ] ]
+    ]
   }
 ]

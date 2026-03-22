@@ -1,5 +1,9 @@
 gdebug.log_info("Bodily Fluids: main")
 local mod = game.mod_runtime[game.current_mod]
+local INCONTINENT_TRAIT = MutationBranchId.new("incontinent")
+local SLEEP_EFFECT = EffectTypeId.new("sleep")
+local SLEEP_GRACE_TURNS = 30
+local update_sleep_state
 
 ------------------------------------------------------------
 -- Every turn
@@ -8,18 +12,59 @@ function mod.every_turn()
     local avatar = gapi.get_avatar()
     if not avatar then return end
 
-    if not avatar:has_trait(MutationBranchId.new("pee")) then
-        avatar:set_mutation(MutationBranchId.new("pee"))
-    end
-
-    if not avatar:has_trait(MutationBranchId.new("defecate")) then
-        avatar:set_mutation(MutationBranchId.new("defecate"))
-    end
+    update_sleep_state(avatar)
 
     handle_bladder(avatar)
     handle_stomach(avatar)
 
     --mod.debug_burn(avatar)
+end
+
+
+local function is_sleeping(avatar)
+    return avatar:has_effect(SLEEP_EFFECT)
+end
+
+local function current_turn_count()
+    local turn = gapi.current_turn()
+    local zero = gapi.turn_zero()
+    if not turn or not zero then return 0 end
+    return (turn - zero):to_turns()
+end
+
+local function is_sleep_grace_active(avatar)
+    local grace_until = tonumber(avatar:get_value("sleep_grace_until")) or 0
+    return current_turn_count() <= grace_until
+end
+
+update_sleep_state = function(avatar)
+    local sleeping = is_sleeping(avatar)
+    local was_sleeping = avatar:get_value("was_sleeping") == "1"
+    if sleeping then
+        avatar:set_value("was_sleeping", "1")
+        avatar:set_value("sleep_grace_until", "0")
+        return
+    end
+
+    if was_sleeping then
+        local grace_until = current_turn_count() + SLEEP_GRACE_TURNS
+        avatar:set_value("sleep_grace_until", tostring(grace_until))
+    end
+    avatar:set_value("was_sleeping", "0")
+end
+
+local function can_relieve_now(avatar)
+    if avatar:has_trait(INCONTINENT_TRAIT) then
+        return true
+    end
+    if is_sleeping(avatar) then
+        return false
+    end
+    return not is_sleep_grace_active(avatar)
+end
+
+local function can_request_relief(avatar)
+    return avatar:has_trait(INCONTINENT_TRAIT) or not is_sleeping(avatar)
 end
 
 ------------------------------------------------------------
@@ -33,7 +78,7 @@ function handle_bladder(avatar)
     avatar:set_value("bladder", tostring(bladder))
 
     if bladder >= 90 and avatar:get_value("bladder_warned_90") ~= "1" then
-        if not avatar:has_trait( MutationBranchId.new("incontinent") ) then
+        if not avatar:has_trait(INCONTINENT_TRAIT) then
             if gapi.get_avatar().current_activity_id ~= ActivityTypeId.NULL_ID then
                 gapi.get_avatar():cancel_activity()
             end
@@ -48,16 +93,13 @@ function handle_bladder(avatar)
         avatar:set_value("bladder_warned_50", "1")
     end
 
-    if avatar:has_active_mutation(MutationBranchId.new("pee")) or avatar:hp_percentage() <= 5 then
-        avatar:deactivate_mutation(MutationBranchId.new("pee"))
-        if math.floor(avatar:get_value("bladder", 0 )/10) < 1 or avatar:has_trait( MutationBranchId.new("incontinent") ) then
-            gapi.add_msg(MsgType.info, "You don't feel the urge to go yet.")
-        else
-            expel(avatar, "pee", false)
-        end
+    local can_release_now = can_relieve_now(avatar)
+
+    if can_release_now and avatar:hp_percentage() <= 5 then
+        expel(avatar, "pee", false)
     end
 
-    if bladder >= 100 then
+    if can_release_now and bladder >= 100 then
         expel(avatar, "pee", true)
     end
 end
@@ -101,7 +143,7 @@ function handle_stomach(avatar)
     avatar:set_value("stomach", tostring(stomach))
 
     if stomach >= 90 and avatar:get_value("stomach_warned_90") ~= "1" then
-        if not avatar:has_trait( MutationBranchId.new("incontinent") ) then
+        if not avatar:has_trait(INCONTINENT_TRAIT) then
             if gapi.get_avatar().current_activity_id ~= ActivityTypeId.NULL_ID then
                 gapi.get_avatar():cancel_activity()
             end
@@ -116,16 +158,13 @@ function handle_stomach(avatar)
         avatar:set_value("stomach_warned_50", "1")
     end
 
-    if avatar:has_active_mutation(MutationBranchId.new("defecate")) or avatar:hp_percentage() <= 5 then
-        avatar:deactivate_mutation(MutationBranchId.new("defecate"))
-        if math.floor(avatar:get_value("stomach", 0 )/10) < 1 or avatar:has_trait( MutationBranchId.new("incontinent") ) then
-            gapi.add_msg(MsgType.info, "You don't feel the urge to go yet.")
-        else
-            expel(avatar, "defecate", false)
-        end
+    local can_release_now = can_relieve_now(avatar)
+
+    if can_release_now and avatar:hp_percentage() <= 5 then
+        expel(avatar, "defecate", false)
     end
 
-    if stomach >= 100 then
+    if can_release_now and stomach >= 100 then
         expel(avatar, "defecate", true)
     end
 end
@@ -173,7 +212,7 @@ function expel(avatar, type, forced)
     local forced_msg = "You soil yourself!"
     local wet_clothing = false
     local place_fluid = true
-    local amount = math.floor( avatar:get_value(stat_name, 0)/10 )
+    local amount = math.max(1, math.floor( avatar:get_value(stat_name, 0)/10 ))
 
     -- Check for diaper
     local diaper_item
@@ -186,7 +225,7 @@ function expel(avatar, type, forced)
 
     if forced then
         if diaper_item then
-            if avatar:has_trait(MutationBranchId.new("incontinent")) then
+            if avatar:has_trait(INCONTINENT_TRAIT) then
                 gapi.get_avatar():add_morale(
                     MoraleTypeDataId.new("morale_used_diaper"),
                     5, 5,
@@ -252,6 +291,45 @@ function expel(avatar, type, forced)
     for _, suffix in ipairs({"", "_warned_50", "_warned_75", "_warned_90"}) do
         avatar:set_value(stat_name .. suffix, "0")
     end
+end
+
+local URGE_MESSAGE = "You don't feel the urge to go yet."
+local SLEEPING_MESSAGE = "You're asleep and can't relieve yourself yet."
+
+local function stat_name_for_relief(type)
+    return (type == "pee") and "bladder" or "stomach"
+end
+
+local function has_relief_urge(avatar, stat_name)
+    local amount = math.floor(avatar:get_value(stat_name, 0)/10)
+    return amount >= 1 and not avatar:has_trait(INCONTINENT_TRAIT)
+end
+
+local function request_relief(type)
+    local avatar = gapi.get_avatar()
+    if not avatar then return false end
+
+    if not can_request_relief(avatar) then
+        gapi.add_msg(MsgType.info, SLEEPING_MESSAGE)
+        return false
+    end
+
+    local stat_name = stat_name_for_relief(type)
+    if not has_relief_urge(avatar, stat_name) then
+        gapi.add_msg(MsgType.info, URGE_MESSAGE)
+        return false
+    end
+
+    expel(avatar, type, false)
+    return true
+end
+
+function mod.attempt_urinate()
+    return request_relief("pee")
+end
+
+function mod.attempt_defecate()
+    return request_relief("defecate")
 end
 
 ------------------------------------------------------------
