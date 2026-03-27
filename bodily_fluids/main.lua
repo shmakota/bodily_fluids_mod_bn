@@ -279,7 +279,11 @@ function expel(avatar, type, forced)
 
     -- Create puddle or pile
     if place_fluid then
-        gapi.get_map():create_item_at(pos, ItypeId.new(item_type), amount)
+        if item_type == "human_feces" then
+            gapi.get_map():create_item_at(pos, ItypeId.new(item_type), 0)
+        else
+            gapi.get_map():create_item_at(pos, ItypeId.new(item_type), amount)
+        end
         if gapi.get_map():has_field_at(pos, FieldTypeIntId.new( FieldTypeId.new("fd_fire") ) ) then
             -- requires 30% of bladder per intensity level (max is 3)
             gapi.add_msg(tostring(math.floor(amount/3)))

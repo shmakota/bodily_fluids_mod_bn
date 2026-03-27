@@ -51,7 +51,7 @@
     "result": "human_fertilizer",
     "category": "CC_OTHER",
     "subcategory": "CSC_OTHER",
-    "skill_used": "gardening",
+    "skill_used": "survival",
     "time": "15 m",
     "autolearn": true,
     "components": [
