@@ -67,14 +67,23 @@ local function can_request_relief(avatar)
     return avatar:has_trait(INCONTINENT_TRAIT) or not is_sleeping(avatar)
 end
 
+local function clamp_need(value)
+    value = tonumber(value) or 0
+    if value < 0 then
+        return 0
+    elseif value > 100 then
+        return 100
+    end
+    return value
+end
+
 ------------------------------------------------------------
 -- BLADDER / PEE
 ------------------------------------------------------------
 function handle_bladder(avatar)
-    local bladder = tonumber(avatar:get_value("bladder")) or 0
+    local bladder = clamp_need(avatar:get_value("bladder"))
 
-    bladder = bladder + get_thirst_difference() * 1
-    if bladder > 100 then bladder = 100 end
+    bladder = clamp_need(bladder + get_thirst_difference())
     avatar:set_value("bladder", tostring(bladder))
 
     if bladder >= 90 and avatar:get_value("bladder_warned_90") ~= "1" then
@@ -136,10 +145,9 @@ end
 -- STOMACH / DEFECATE
 ------------------------------------------------------------
 function handle_stomach(avatar)
-    local stomach = tonumber(avatar:get_value("stomach")) or 0
+    local stomach = clamp_need(avatar:get_value("stomach"))
 
-    stomach = stomach - get_kcal_difference()/20
-    if stomach > 100 then stomach = 100 end
+    stomach = clamp_need(stomach - get_kcal_difference() / 20)
     avatar:set_value("stomach", tostring(stomach))
 
     if stomach >= 90 and avatar:get_value("stomach_warned_90") ~= "1" then
@@ -305,7 +313,7 @@ local function stat_name_for_relief(type)
 end
 
 local function has_relief_urge(avatar, stat_name)
-    local amount = math.floor(avatar:get_value(stat_name, 0)/10)
+    local amount = math.floor(clamp_need(avatar:get_value(stat_name)) / 10)
     return amount >= 1 and not avatar:has_trait(INCONTINENT_TRAIT)
 end
 
