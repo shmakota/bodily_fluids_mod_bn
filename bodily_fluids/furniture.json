@@ -1,0 +1,10 @@
+[
+  {
+    "type": "furniture",
+    "id": "f_toilet",
+    "copy-from": "f_toilet",
+    "symbol": "&",
+    "color": "white",
+    "examine_action": "lua:BODILY_FLUIDS_TOILET"
+  }
+]
