@@ -12,6 +12,7 @@
     "looks_like": "diesel",
     "material": [ "water" ],
     "phase": "liquid",
+    "spill_field": "fd_urine",
     "comestible_type": "DRINK",
     "quench": -10,
     "calories": 0,

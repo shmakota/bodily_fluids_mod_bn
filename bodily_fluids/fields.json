@@ -1,0 +1,21 @@
+[
+  {
+    "id": "fd_urine",
+    "type": "field_type",
+    "intensity_levels": [
+      { "name": "urine splatter", "sym": "~", "color": "yellow" },
+      { "name": "urine puddle" },
+      { "name": "pool of urine", "color": "yellow" }
+    ],
+    "description_affix": "covered_in_a",
+    "is_splattering": true,
+    "accelerated_decay": true,
+    "half_life": "30 minutes",
+    "underwater_age_speedup": "5 minutes",
+    "phase": "liquid",
+    "moppable": true,
+    "tint": "yellow",
+    "display_field": true,
+    "looks_like": "fd_water"
+  }
+]
